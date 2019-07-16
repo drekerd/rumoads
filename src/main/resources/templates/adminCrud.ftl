@@ -9,6 +9,20 @@
     <title>Rumos Adds</title>
   </head>
   <body>
+
+    <form method="POST" action='newAdd' name="newAdd" id="newAddForm">
+
+             <!-- Add ID : <input type="text" readonly="readonly" name="addId"/> -->
+        
+              Add Title : <input type="text" name="addName" required/>
+        
+              Add Description : <input type="text" name="addDescription" required/>
+        
+              Price : <input type="number" name="addPrice" required />
+       
+              <input type="submit" value="Submit" />
+     </form>
+
   <div class="centered">
 
    <table class="table table-striped">
