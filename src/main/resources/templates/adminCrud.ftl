@@ -4,11 +4,14 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>Rumos Adds</title>
   </head>
   <body>
-    <table class="table table-striped">
+  <div class="centered">
+
+   <table class="table table-striped">
       <thead class="thead-light">
         <tr>
           <th scope="col">#</th>
