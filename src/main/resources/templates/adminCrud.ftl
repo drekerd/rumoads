@@ -58,15 +58,7 @@
     <#else>
 
     <!--table if list is null-->
-    <table>
-       <tbody>
-             <#list addsFromBE as item>
-               <tr>
-                 <th No Adds to Display</th>
-               </tr>
-             </#list>
-        </tbody>
-    </table>
+    <h1>No Adds To Display</h1>
     </#if>
   </body>
 </html>
