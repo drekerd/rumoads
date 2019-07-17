@@ -10,7 +10,7 @@
   </head>
   <body>
 
-    <form method="POST" action='newAdd' name="newAdd" id="newAddForm">
+    <form method="POST" action='admin' name="newAdd" id="newAddForm">
 
              <!-- Add ID : <input type="text" readonly="readonly" name="addId"/> -->
         
@@ -23,8 +23,11 @@
               <input type="submit" value="Submit" />
      </form>
 
+     </br>
+
   <div class="centered">
 
+  <#if addsFromBE?has_content>
    <table class="table table-striped">
       <thead class="thead-light">
         <tr>
@@ -41,9 +44,29 @@
           <td>${item.addName}</td>
           <td>${item.addDescription}</a></td>
           <td>${item.addPrice?string.computer}</td>
+          <td><a href="/admin/delete?id=${item.addId}">Delete</a></td>
+          <td>
+            <form method="post" action="/admin/delete?id=${item.addId}" target="_self">
+                <input type="submit" value="Delete">
+            </form>
+          </td>
         </tr>
       </#list>
       </tbody>
     </table>
+
+    <#else>
+
+    <!--table if list is null-->
+    <table>
+       <tbody>
+             <#list addsFromBE as item>
+               <tr>
+                 <th No Adds to Display</th>
+               </tr>
+             </#list>
+        </tbody>
+    </table>
+    </#if>
   </body>
 </html>
