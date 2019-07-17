@@ -10,7 +10,7 @@
   </head>
   <body>
 
-    <form method="POST" action='admin' name="newAdd" id="newAddForm">
+    <form method="POST" action='/admin' name="newAdd" id="newAddForm" target="_self">
 
              <!-- Add ID : <input type="text" readonly="readonly" name="addId"/> -->
         
@@ -44,7 +44,6 @@
           <td>${item.addName}</td>
           <td>${item.addDescription}</a></td>
           <td>${item.addPrice?string.computer}</td>
-          <td><a href="/admin/delete?id=${item.addId}">Delete</a></td>
           <td>
             <form method="post" action="/admin/delete?id=${item.addId}" target="_self">
                 <input type="submit" value="Delete">

@@ -47,7 +47,7 @@ public class AddsController {
         persistAdd(add);
         model.addAttribute("addsFromBE", service.getAdds());
 
-        return new ModelAndView("adminCrud");
+        return new ModelAndView("redirect:/admin");
     }
 
     @RequestMapping("/admin/delete{id}")
@@ -56,7 +56,7 @@ public class AddsController {
         deleteAdd(id);
         model.addAttribute("addsFromBE", service.getAdds());
 
-        return new ModelAndView("adminCrud");
+        return new ModelAndView("redirect:/admin");
     }
 
     // @TODO Update Add
