@@ -1,19 +1,20 @@
 package com.example.rumosAds;
 
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
+import com.example.messages.MessageProducer;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.jms.Queue;
 
 @Controller
 public class AddsController {
@@ -22,7 +23,15 @@ public class AddsController {
     //@TODO refractor Adds name
 
     @Autowired
+    JmsTemplate jmsTemplate;
+
+    @Autowired
+    Queue queue;
+
+    @Autowired
     private AddsService service;
+
+    MessageProducer messageProducer = new MessageProducer();
 
     //this method is only to check if project is running when something is not working
     @RequestMapping("/hello")
@@ -44,8 +53,13 @@ public class AddsController {
     @PostMapping("/admin")
     public ModelAndView newAdd(Adds add, Model model) {
         LOGGER.info("RequestMapping admin POST" + add.toString());
-        persistAdd(add);
+
         model.addAttribute("addsFromBE", service.getAdds());
+        String serializedAdd = serializationToJson(persistAdd(add));
+
+        //its just returning the last added movie for now. Its just an "hello world" to start
+        jmsTemplate.convertAndSend(queue, serializedAdd);
+        LOGGER.info("message : PUBLISHED, with message " + serializedAdd);
 
         return new ModelAndView("redirect:/admin");
     }
@@ -70,6 +84,7 @@ public class AddsController {
                 if (add.getAddId() == id) {
                     service.getAdds().remove(add);
                     LOGGER.warning("Delete ADD: ended with SUCCESS : ADD " + add.getAddName() + " DELETED");
+
                     return;
                 } else
                     LOGGER.warning("Delete ADD: ended with ERROR : NO ADD FOUND");
@@ -77,9 +92,9 @@ public class AddsController {
         }
     }
 
-    private void persistAdd(Adds add) {
+    private Adds persistAdd(Adds add) {
         if (service.getAdds().contains(add)) {
-            return;
+            return null;
         } else {
             Adds addToPersist = new Adds();
             addToPersist.setAddId(service.getAdds().size() + 1);
@@ -87,8 +102,14 @@ public class AddsController {
             addToPersist.setAddDescription(add.getAddDescription());
             addToPersist.setAddPrice(add.getAddPrice());
             service.getAdds().add(addToPersist);
+
+            return addToPersist;
         }
     }
 
+    private String serializationToJson(Adds add) {
+        Gson gson = new Gson();
+        return gson.toJson(add);
+    }
 
 }
