@@ -32,7 +32,7 @@ public class MessageProducer {
         return "adminCrud";
     }
 
-    //@TODO Should surpress postMessage and start using this method
+    //@TODO Should surpress postMessage method and start using this method
     public String publishMessage(String add) {
         LOGGER.info("message : PUBLISHED, with message " + add.toString());
         jmsTemplate.convertAndSend(queue, add);

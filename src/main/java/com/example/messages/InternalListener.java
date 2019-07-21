@@ -12,6 +12,7 @@ public class InternalListener {
 
     private static final Logger LOGGER = Logger.getLogger("MessageProducer");
 
+    //Just for Debugging
     @JmsListener(destination = "standalone.queue")
     public void consume(String message) {
 

@@ -1,19 +1,24 @@
 package com.example.rumosAds;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.example.messages.MessageProducer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.jms.JMSException;
 import javax.jms.Queue;
 
 @Controller
@@ -55,11 +60,10 @@ public class AddsController {
         LOGGER.info("RequestMapping admin POST" + add.toString());
 
         model.addAttribute("addsFromBE", service.getAdds());
-        String serializedAdd = serializationToJson(persistAdd(add));
+        persistAdd(add);
+        jmsTemplate.convertAndSend(queue, serializationToJson());
 
-        //its just returning the last added movie for now. Its just an "hello world" to start
-        jmsTemplate.convertAndSend(queue, serializedAdd);
-        LOGGER.info("message : PUBLISHED, with message " + serializedAdd);
+        LOGGER.info("message : PUBLISHED, with message " + serializationToJson());
 
         return new ModelAndView("redirect:/admin");
     }
@@ -107,9 +111,33 @@ public class AddsController {
         }
     }
 
-    private String serializationToJson(Adds add) {
-        Gson gson = new Gson();
-        return gson.toJson(add);
+    private String serializationToJson() {
+        LOGGER.info("serializationToJson : started");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(service.getAdds());
+
+        if (!json.isEmpty()) {
+            LOGGER.info("serializationToJson FINISHED : SUCCESS " + json);
+            return json;
+        } else {
+            LOGGER.info("serializationToJson FINISHED : FAIL ");
+            return "ERROR";
+        }
+    }
+
+    //endpoint to Check Payloads
+    @RequestMapping(value = "/endpoint/allAdds",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String addsListEndPoint() {
+        LOGGER.info("EndPoint All Adds : started");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String addsTojson = gson.toJson(service.getAdds());
+
+        LOGGER.info("EndPoint All return : " + addsTojson);
+
+        return addsTojson;
     }
 
 }
