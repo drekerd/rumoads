@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,6 +23,7 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 
 @Controller
+@Service
 public class AddsController {
     private static final Logger LOGGER = Logger.getLogger("AddsController");
 
@@ -94,6 +96,16 @@ public class AddsController {
                     LOGGER.warning("Delete ADD: ended with ERROR : NO ADD FOUND");
             }
         }
+    }
+
+    @PostMapping("/admin/sync")
+    public String syncAdds(Model model){
+        LOGGER.info("manuall sync : started");
+        LocalTime time = LocalTime.now();
+        jmsTemplate.convertAndSend(queue, serializationToJson());
+        model.addAttribute("lastSync", time);
+        LOGGER.info("manually sync : ended");
+        return "redirect:/admin";
     }
 
     private Adds persistAdd(Adds add) {

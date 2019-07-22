@@ -1,8 +1,13 @@
 package com.example.rumosAds;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.jms.Queue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +21,13 @@ public class AddsService {
 
     private List<Adds> adds;
 
-    AddsService(){
+    @Autowired
+    JmsTemplate jmsTemplate;
+
+    @Autowired
+    Queue queue;
+
+    AddsService() {
 
         adds = new ArrayList<>();
 
