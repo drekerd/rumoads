@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
+import com.example.dao.CoursesDAO;
 import com.example.messages.MessageProducer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,7 +38,13 @@ public class AddsController {
     Queue queue;
 
     @Autowired
+    List<Adds> addsFromDB;
+
+    @Autowired
     private AddsService service;
+
+    @Autowired
+    private CoursesDAO coursesDAO;
 
     MessageProducer messageProducer = new MessageProducer();
 
@@ -52,7 +60,8 @@ public class AddsController {
     @GetMapping("/admin")
     public String getAdds(Model model) {
         LOGGER.info("RequestMapping admin GET: started");
-        model.addAttribute("addsFromBE", service.getAdds());
+        this.addsFromDB = coursesDAO.findAll();
+        model.addAttribute("addsFromBE", addsFromDB);
 
         return "adminCrud";
     }
@@ -61,7 +70,7 @@ public class AddsController {
     public ModelAndView newAdd(Adds add, Model model) {
         LOGGER.info("RequestMapping admin POST" + add.toString());
 
-        model.addAttribute("addsFromBE", service.getAdds());
+        // model.addAttribute("addsFromBE", service.getAdds());
         persistAdd(add);
         jmsTemplate.convertAndSend(queue, serializationToJson());
 
@@ -106,69 +115,28 @@ public class AddsController {
 
 
     private void updateAdd(Adds addToUpdate) {
-        if (service.getAdds().isEmpty()) {
-            LOGGER.warning("Update ADD: ended with ERROR : LIST IS EMPTY");
-            return;
-        } else {
-            for (Adds add : service.getAdds()) {
-                if (add.getAddId() == addToUpdate.getAddId()) {
-                    service.getAdds().set(service.getAdds().indexOf(add), addToUpdate);
-                    LOGGER.warning("Update ADD: ended with SUCCESS :"
-                            + " FROM " + add.getAddName() + " TO " + addToUpdate.getAddName()
-                            + " FROM " + add.getAddDescription() + " TO " + addToUpdate.getAddDescription()
-                            + " FROM " + add.getAddPrice() + " TO " + addToUpdate.getAddPrice());
-                    return;
-                } else
-                    LOGGER.warning("Update ADD: ended with ERROR : NO ADD FOUND");
-            }
-        }
+        coursesDAO.save(addToUpdate);
+        LOGGER.info("Course updated : " + addToUpdate.toString());
     }
 
     private void deleteAdd(long id) {
-        if (service.getAdds().isEmpty()) {
-            LOGGER.warning("Delete ADD: ended with ERROR : LIST IS EMPTY");
-            return;
-        } else {
-            for (Adds add : service.getAdds()) {
-                if (add.getAddId() == id) {
-                    service.getAdds().remove(add);
-                    LOGGER.warning("Delete ADD: ended with SUCCESS : ADD " + add.getAddName() + " DELETED");
-
-                    return;
-                } else
-                    LOGGER.warning("Delete ADD: ended with ERROR : NO ADD FOUND");
-            }
-        }
+        coursesDAO.deleteById(id);
+        LOGGER.info("Course deleted");
     }
 
-    private Adds persistAdd(Adds add) {
-        if (service.getAdds().contains(add)) {
-            return null;
-        } else {
-            Adds addToPersist = new Adds();
-            addToPersist.setAddId(service.getAdds().size() + 1);
-            addToPersist.setAddName(add.getAddName());
-            addToPersist.setAddDescription(add.getAddDescription());
-            addToPersist.setAddPrice(add.getAddPrice());
-            service.getAdds().add(addToPersist);
-
-            return addToPersist;
-        }
+    private void persistAdd(Adds add) {
+        coursesDAO.save(add);
+        LOGGER.info("Course Persisted : " + add.toString());
     }
 
 
     private Adds getSpecificAdd(long id) {
-        if (service.getAdds().isEmpty()) {
-            return null;
-        } else {
-            for (Adds add : service.getAdds()) {
-                if (add.getAddId() == id) {
-                    return add;
-                } else
-                    LOGGER.warning("Get Specific ADD: ended with ERROR : NO ADD FOUND");
-            }
-            return null;
-        }
+        Adds add = new Adds();
+        add.setAddId(coursesDAO.findById(id).get().getAddId());
+        add.setAddName(coursesDAO.findById(id).get().getAddName());
+        add.setAddDescription(coursesDAO.findById(id).get().getAddDescription());
+        add.setAddPrice(coursesDAO.findById(id).get().getAddPrice());
+        return add;
     }
 
 
