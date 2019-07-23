@@ -60,6 +60,11 @@
                             <input type="submit" value="Delete">
                         </form>
                     </td>
+                    <td>
+                        <form method="post" action="/admin/edit-page?id=${item.addId}" target="_self">
+                            <input type="submit" value="Update">
+                        </form>
+                    </td>
                 </tr>
             </#list>
             </tbody>

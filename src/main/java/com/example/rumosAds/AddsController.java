@@ -79,7 +79,50 @@ public class AddsController {
         return new ModelAndView("redirect:/admin");
     }
 
-    // @TODO Update Add
+    @RequestMapping("/admin/edit-page{id}")
+    public String getUpdatepage(long id, Model model) {
+        LOGGER.info("RequestMapping admin get Update Page : starts, for ID = " + id);
+        model.addAttribute("add", getSpecificAdd(id));
+        return "update";
+    }
+
+    @PostMapping("/admin/edit")
+    public String updateAddForm(Adds add, Model model) {
+        LOGGER.info("RequestMapping admin Update Add : starts, for ID = " + add.getAddId());
+        updateAdd(add);
+        return "redirect:/admin";
+    }
+
+
+    @PostMapping("/admin/sync")
+    public String syncAdds(Model model) {
+        LOGGER.info("manuall sync : started");
+        LocalTime time = LocalTime.now();
+        jmsTemplate.convertAndSend(queue, serializationToJson());
+        model.addAttribute("lastSync", time);
+        LOGGER.info("manually sync : ended");
+        return "redirect:/admin";
+    }
+
+
+    private void updateAdd(Adds addToUpdate) {
+        if (service.getAdds().isEmpty()) {
+            LOGGER.warning("Update ADD: ended with ERROR : LIST IS EMPTY");
+            return;
+        } else {
+            for (Adds add : service.getAdds()) {
+                if (add.getAddId() == addToUpdate.getAddId()) {
+                    service.getAdds().set(service.getAdds().indexOf(add), addToUpdate);
+                    LOGGER.warning("Update ADD: ended with SUCCESS :"
+                            + " FROM " + add.getAddName() + " TO " + addToUpdate.getAddName()
+                            + " FROM " + add.getAddDescription() + " TO " + addToUpdate.getAddDescription()
+                            + " FROM " + add.getAddPrice() + " TO " + addToUpdate.getAddPrice());
+                    return;
+                } else
+                    LOGGER.warning("Update ADD: ended with ERROR : NO ADD FOUND");
+            }
+        }
+    }
 
     private void deleteAdd(long id) {
         if (service.getAdds().isEmpty()) {
@@ -98,16 +141,6 @@ public class AddsController {
         }
     }
 
-    @PostMapping("/admin/sync")
-    public String syncAdds(Model model){
-        LOGGER.info("manuall sync : started");
-        LocalTime time = LocalTime.now();
-        jmsTemplate.convertAndSend(queue, serializationToJson());
-        model.addAttribute("lastSync", time);
-        LOGGER.info("manually sync : ended");
-        return "redirect:/admin";
-    }
-
     private Adds persistAdd(Adds add) {
         if (service.getAdds().contains(add)) {
             return null;
@@ -122,6 +155,22 @@ public class AddsController {
             return addToPersist;
         }
     }
+
+
+    private Adds getSpecificAdd(long id) {
+        if (service.getAdds().isEmpty()) {
+            return null;
+        } else {
+            for (Adds add : service.getAdds()) {
+                if (add.getAddId() == id) {
+                    return add;
+                } else
+                    LOGGER.warning("Get Specific ADD: ended with ERROR : NO ADD FOUND");
+            }
+            return null;
+        }
+    }
+
 
     private String serializationToJson() {
         LOGGER.info("serializationToJson : started");
