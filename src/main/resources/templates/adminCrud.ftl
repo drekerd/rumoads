@@ -28,9 +28,9 @@
       
             Add Description : <input type="text" name="addDescription" required/>
 
-            Category : <select>
+            Category : <select name="addCategory">
                             <#list categoryList as category>
-                                <option name="categoryId" value="${category.categoryName}">${category}</option>
+                                <option name="addCategory" value="${category.categoryName}">${category.categoryName}</option>
                             </#list>
                       </select>
             Price : <input type="number" step="0.01" name="addPrice" required/>
@@ -63,6 +63,7 @@
           <th scope="col">#</th>
           <th scope="col">Course</th>
           <th scope="col">Description</th>
+          <th scope="col">Category</th>
           <th scope="col">Price</th>
           <th>
               <form method="post" action="/admin/sync" target="_self">
@@ -77,8 +78,8 @@
             <tr>
               <th scope="row">${item.addId?string.computer}</th>
               <td>${item.addName}</td>
-             <td>${item.addDescription}</a></td>
-             <td>${item.addCategory}</a></td>
+             <td>${item.addDescription}</td>
+             <td>${item.addCategory}</td>
              <td>${item.addPrice?string.computer}</td>
              <td>
                  <form method="post" action="/admin/delete?id=${item.addId}" target="_self">
