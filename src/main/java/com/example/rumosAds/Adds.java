@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
 import java.util.logging.Logger;
+import com.example.categories.*;
 
 @Data
 @Service
@@ -17,12 +18,15 @@ public class Adds {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long addId;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String addName;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String addDescription;
 
     @Column(nullable = false)
     private double addPrice;
+
+    //@Column(nullable = false)
+    private String addCategory;
 }

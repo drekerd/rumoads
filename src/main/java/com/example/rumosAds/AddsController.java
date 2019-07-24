@@ -3,6 +3,7 @@ package com.example.rumosAds;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -20,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import com.example.categories.*;
 
+import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 
@@ -46,7 +49,26 @@ public class AddsController {
     @Autowired
     private CoursesDAO coursesDAO;
 
+    @Autowired
+    private CategoryService categoryService;
+
+    List<String> categoryList = new ArrayList<>();
+
+
+
     MessageProducer messageProducer = new MessageProducer();
+
+    @PostConstruct
+    public void setCategories(){
+        List<CourseCategory> categories = new ArrayList<>();
+        CourseCategory courseCategoryIT = new CourseCategory();
+        CourseCategory courseCategoryUX = new CourseCategory();
+        courseCategoryIT.setCategoryName("IT");
+        courseCategoryUX.setCategoryName("UX");
+        categories.add(courseCategoryIT);
+        categories.add(courseCategoryUX);
+        categoryService.setCategories(categories);
+    }
 
     //this method is only to check if project is running when something is not working
     @RequestMapping("/hello")
@@ -62,6 +84,7 @@ public class AddsController {
         LOGGER.info("RequestMapping admin GET: started");
         this.addsFromDB = coursesDAO.findAll();
         model.addAttribute("addsFromBE", addsFromDB);
+        model.addAttribute("categoryList", categoryService.getCategories());
 
         return "adminCrud";
     }
@@ -70,7 +93,6 @@ public class AddsController {
     public ModelAndView newAdd(Adds add, Model model) {
         LOGGER.info("RequestMapping admin POST" + add.toString());
 
-        // model.addAttribute("addsFromBE", service.getAdds());
         persistAdd(add);
         jmsTemplate.convertAndSend(queue, serializationToJson());
 
@@ -84,7 +106,6 @@ public class AddsController {
         LOGGER.info("RequestMapping admin DELETE : starts, ID = " + id);
         deleteAdd(id);
         model.addAttribute("addsFromBE", service.getAdds());
-
         return new ModelAndView("redirect:/admin");
     }
 
@@ -129,7 +150,6 @@ public class AddsController {
         LOGGER.info("Course Persisted : " + add.toString());
     }
 
-
     private Adds getSpecificAdd(long id) {
         Adds add = new Adds();
         add.setAddId(coursesDAO.findById(id).get().getAddId());
@@ -143,7 +163,7 @@ public class AddsController {
     private String serializationToJson() {
         LOGGER.info("serializationToJson : started");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(service.getAdds());
+        String json = gson.toJson(coursesDAO.findAll());
 
         if (!json.isEmpty()) {
             LOGGER.info("serializationToJson FINISHED : SUCCESS " + json);

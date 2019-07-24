@@ -25,7 +25,7 @@ public class MessageController {
 
     @Bean
     public Queue queue() {
-        LOGGER.info("Quere : started");
+        LOGGER.info("Queue : started");
         return new ActiveMQQueue("standalone.queue");
     }
 

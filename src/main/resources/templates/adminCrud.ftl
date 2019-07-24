@@ -27,7 +27,12 @@
             Add Title : <input type="text" name="addName" required/>
       
             Add Description : <input type="text" name="addDescription" required/>
-      
+
+            Category : <select>
+                            <#list categoryList as category>
+                                <option name="categoryId" value="${category.categoryName}">${category}</option>
+                            </#list>
+                      </select>
             Price : <input type="number" step="0.01" name="addPrice" required/>
      
     <input type="submit" value="Submit"/>
@@ -73,6 +78,7 @@
               <th scope="row">${item.addId?string.computer}</th>
               <td>${item.addName}</td>
              <td>${item.addDescription}</a></td>
+             <td>${item.addCategory}</a></td>
              <td>${item.addPrice?string.computer}</td>
              <td>
                  <form method="post" action="/admin/delete?id=${item.addId}" target="_self">
