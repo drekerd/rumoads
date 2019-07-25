@@ -28,5 +28,5 @@ public class Adds {
     private double addPrice;
 
     //@Column(nullable = false)
-    private String addCategory;
+    private int addCategory;
 }

@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 @Service
-public class CategoryService {
+public class
+CategoryService {
 
     List<CourseCategory> categories;
 

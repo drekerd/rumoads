@@ -50,6 +50,9 @@ public class AddsController {
     private CoursesDAO coursesDAO;
 
     @Autowired
+    private CoursesDAO categoryDAO;
+
+    @Autowired
     private CategoryService categoryService;
 
     List<String> categoryList = new ArrayList<>();
@@ -60,14 +63,7 @@ public class AddsController {
 
     @PostConstruct
     public void setCategories(){
-        List<CourseCategory> categories = new ArrayList<>();
-        CourseCategory courseCategoryIT = new CourseCategory();
-        CourseCategory courseCategoryUX = new CourseCategory();
-        courseCategoryIT.setCategoryName("IT");
-        courseCategoryUX.setCategoryName("UX");
-        categories.add(courseCategoryIT);
-        categories.add(courseCategoryUX);
-        categoryService.setCategories(categories);
+
     }
 
     //this method is only to check if project is running when something is not working
@@ -84,7 +80,7 @@ public class AddsController {
         LOGGER.info("RequestMapping admin GET: started");
         this.addsFromDB = coursesDAO.findAll();
         model.addAttribute("addsFromBE", addsFromDB);
-        model.addAttribute("categoryList", categoryService.getCategories());
+        model.addAttribute("categoryList", categoryDAO.findAll());
 
         return "adminCrud";
     }
@@ -123,7 +119,6 @@ public class AddsController {
         return "redirect:/admin";
     }
 
-
     @PostMapping("/admin/sync")
     public String syncAdds(Model model) {
         LOGGER.info("manuall sync : started");
@@ -133,7 +128,6 @@ public class AddsController {
         LOGGER.info("manually sync : ended");
         return "redirect:/admin";
     }
-
 
     private void updateAdd(Adds addToUpdate) {
         coursesDAO.save(addToUpdate);
