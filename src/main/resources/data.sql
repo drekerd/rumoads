@@ -1,9 +1,12 @@
 INSERT INTO COURSE VALUES
-(1, 1, 'This us a Full Stack Java Course', 'Java Course', 2.575),
-(2, 1, 'This us a Full Stack Ruby Course', 'Ruby Course', 2.000),
-(3, 2, 'Learn How to give User Experience', 'UI/UX', 2.000);
+(1, 1, 'IT', 'This us a Full Stack JAVA Course', 'JAVA', 2.555),
+(2, 1, 'IT', 'This us a Full Stack Ruby Course', 'Ruby', 2.575),
+(3, 2, 'DESIGN', 'This us a Full Stack UI/UX Course', 'Design', 2.575);
 
 INSERT INTO CATEGORY VALUES
 (1, 'IT'),
 (2, 'DESIGN');
 
+INSERT INTO CLIENT VALUES
+(1, 'FLAG', 1),
+(2, 'GALILEU', 2);

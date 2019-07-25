@@ -8,11 +8,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import com.example.clients.Client;
+import com.example.clients.ClientService;
+import com.example.dao.CategoryDAO;
+import com.example.dao.ClientDAO;
 import com.example.dao.CoursesDAO;
 import com.example.messages.MessageProducer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
@@ -33,6 +38,7 @@ public class AddsController {
     private static final Logger LOGGER = Logger.getLogger("AddsController");
 
     //@TODO refractor Adds name
+    //@TODO refractor SERVICE CLASSES FOR EACH ONE
 
     @Autowired
     JmsTemplate jmsTemplate;
@@ -50,20 +56,26 @@ public class AddsController {
     private CoursesDAO coursesDAO;
 
     @Autowired
-    private CoursesDAO categoryDAO;
+    private CategoryDAO categoryDAO;
+
+    @Autowired
+    private ClientDAO clientDAO;
 
     @Autowired
     private CategoryService categoryService;
 
-    List<String> categoryList = new ArrayList<>();
+    @Autowired
+    private ClientService clientService;
 
-
-
-    MessageProducer messageProducer = new MessageProducer();
+    private static final String FLAG_QUEUE = "flag.courses";
+    private static final String GALILEU_QUEUE = "galileu.courses";
+    private static final String EDIT_QUEUE = "edit.courses";
 
     @PostConstruct
     public void setCategories(){
 
+        LOGGER.info("Adds " + coursesDAO.findAll());
+        LOGGER.info("Category " + categoryDAO.findAll());
     }
 
     //this method is only to check if project is running when something is not working
@@ -90,7 +102,6 @@ public class AddsController {
         LOGGER.info("RequestMapping admin POST" + add.toString());
 
         persistAdd(add);
-        jmsTemplate.convertAndSend(queue, serializationToJson());
 
         LOGGER.info("message : PUBLISHED, with message " + serializationToJson());
 
@@ -129,6 +140,20 @@ public class AddsController {
         return "redirect:/admin";
     }
 
+    private void clientSort(){
+        List<Client> sendToClient;
+        //Client, getClientProductThatCosunes -> GetAllCourses which Category ID Match client ProductID;
+        for(Client c : clientDAO.findAll()){
+            sendToClient = new ArrayList<>();
+            /**
+             *  sendToClient = c.
+             */
+
+        }
+
+        jmsTemplate.convertAndSend(queue, serializationToJson());
+    }
+
     private void updateAdd(Adds addToUpdate) {
         coursesDAO.save(addToUpdate);
         LOGGER.info("Course updated : " + addToUpdate.toString());
@@ -140,7 +165,9 @@ public class AddsController {
     }
 
     private void persistAdd(Adds add) {
-        coursesDAO.save(add);
+        Adds addToPersist = add;
+        addToPersist.setAddCategoryName(categoryDAO.findById(add.getAddCategoryID()).get().getCategoryName());
+        coursesDAO.save(addToPersist);
         LOGGER.info("Course Persisted : " + add.toString());
     }
 
@@ -152,7 +179,6 @@ public class AddsController {
         add.setAddPrice(coursesDAO.findById(id).get().getAddPrice());
         return add;
     }
-
 
     private String serializationToJson() {
         LOGGER.info("serializationToJson : started");

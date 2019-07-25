@@ -24,9 +24,11 @@ public class Adds {
     //@Column(nullable = false)
     private String addDescription;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private double addPrice;
 
     //@Column(nullable = false)
-    private int addCategory;
+    private int addCategoryID;
+
+    private String addCategoryName;
 }

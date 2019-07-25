@@ -28,10 +28,14 @@
       
             Add Description : <input type="text" name="addDescription" required/>
 
-            Category : <select name="addCategory">
-                            <#list categoryList as category>
-                                <option name="addCategory" value="${category.categoryName}">${category.categoryName}</option>
-                            </#list>
+            Category : <select name="addCategoryID">
+                            <#if categoryList??>
+                                <#list categoryList as category>
+                                    <option value="${category.categoryId}">${category.categoryName}</option>
+                                </#list>
+                            <#else >
+                                <option name="addCategory" value="NA">NA</option>
+                            </#if>
                       </select>
             Price : <input type="number" step="0.01" name="addPrice" required/>
      
@@ -79,7 +83,7 @@
               <th scope="row">${item.addId?string.computer}</th>
               <td>${item.addName}</td>
              <td>${item.addDescription}</td>
-             <td>${item.addCategory}</td>
+             <td>${item.addCategoryName}</td>
              <td>${item.addPrice?string.computer}</td>
              <td>
                  <form method="post" action="/admin/delete?id=${item.addId}" target="_self">

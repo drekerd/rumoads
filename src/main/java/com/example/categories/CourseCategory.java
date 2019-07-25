@@ -12,6 +12,5 @@ public class CourseCategory {
 
     @Id
     private int categoryId;
-
     private String categoryName;
 }
