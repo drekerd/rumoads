@@ -10,13 +10,22 @@ import java.util.logging.Logger;
 @Component
 public class InternalListener {
 
+    /**
+     * this class is just for debugging and initial stagings of developments
+     * ex: new message queue URL
+     * */
+
     private static final Logger LOGGER = Logger.getLogger("MessageProducer");
 
-    //Just for Debugging
-    @JmsListener(destination = "standalone.queue")
-    public void consume(String message) {
 
-        LOGGER.info("Consumes : started with message " + message);
 
+    @JmsListener(destination = "flag.queue")
+    public void consumeFromFlag(String message) {
+        LOGGER.info("Consumes FLAG: started with message " + message);
+    }
+
+    @JmsListener(destination = "galileu.queue")
+    public void consumeFromGalileu(String message) {
+        LOGGER.info("Consumes GALILEU : started with message " + message);
     }
 }

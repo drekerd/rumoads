@@ -28,7 +28,7 @@
       
             Add Description : <input type="text" name="addDescription" required/>
 
-            Category : <select name="addCategoryID">
+            Category : <select name="category">
                             <#if categoryList??>
                                 <#list categoryList as category>
                                     <option value="${category.categoryId}">${category.categoryName}</option>
@@ -83,7 +83,7 @@
               <th scope="row">${item.addId?string.computer}</th>
               <td>${item.addName}</td>
              <td>${item.addDescription}</td>
-             <td>${item.addCategoryName}</td>
+             <td>${item.category.categoryName}</td>
              <td>${item.addPrice?string.computer}</td>
              <td>
                  <form method="post" action="/admin/delete?id=${item.addId}" target="_self">
@@ -100,7 +100,6 @@
       </tbody>
     </table>
     <#else>
-
             <!--table if list is null-->
             <h1>No Adds To Display</h1>
         </#if>

@@ -72,10 +72,11 @@ public class AddsController {
     private static final String EDIT_QUEUE = "edit.courses";
 
     @PostConstruct
-    public void setCategories(){
+    public void setCategories() {
 
         LOGGER.info("Adds " + coursesDAO.findAll());
         LOGGER.info("Category " + categoryDAO.findAll());
+        clientSort();
     }
 
     //this method is only to check if project is running when something is not working
@@ -103,7 +104,7 @@ public class AddsController {
 
         persistAdd(add);
 
-        LOGGER.info("message : PUBLISHED, with message " + serializationToJson());
+        LOGGER.info("message : PUBLISHED, with message ");
 
         return new ModelAndView("redirect:/admin");
     }
@@ -134,24 +135,20 @@ public class AddsController {
     public String syncAdds(Model model) {
         LOGGER.info("manuall sync : started");
         LocalTime time = LocalTime.now();
-        jmsTemplate.convertAndSend(queue, serializationToJson());
+        clientSort();
         model.addAttribute("lastSync", time);
         LOGGER.info("manually sync : ended");
         return "redirect:/admin";
     }
 
-    private void clientSort(){
-        List<Client> sendToClient;
-        //Client, getClientProductThatCosunes -> GetAllCourses which Category ID Match client ProductID;
-        for(Client c : clientDAO.findAll()){
-            sendToClient = new ArrayList<>();
-            /**
-             *  sendToClient = c.
-             */
-
+    private void clientSort() {
+        List<Client> clients = clientDAO.findAll();
+        for (Client c : clientDAO.findAll()) {
+            List<Adds> coursesByCategory = coursesDAO.findByCategoryCategoryId(c.getPreferedCategory());
+            jmsTemplate.convertAndSend(c.getCLIENT_QUEUE(), serializationToJson(coursesByCategory));
+            LOGGER.info("SORTED CLIENT " + c.getClientName() + " with courses " + coursesByCategory);
         }
 
-        jmsTemplate.convertAndSend(queue, serializationToJson());
     }
 
     private void updateAdd(Adds addToUpdate) {
@@ -165,9 +162,8 @@ public class AddsController {
     }
 
     private void persistAdd(Adds add) {
-        Adds addToPersist = add;
-        addToPersist.setAddCategoryName(categoryDAO.findById(add.getAddCategoryID()).get().getCategoryName());
-        coursesDAO.save(addToPersist);
+        LOGGER.info("PERSIST STARTED");
+        coursesDAO.save(add);
         LOGGER.info("Course Persisted : " + add.toString());
     }
 
@@ -180,10 +176,10 @@ public class AddsController {
         return add;
     }
 
-    private String serializationToJson() {
+    private String serializationToJson(List<Adds> adds) {
         LOGGER.info("serializationToJson : started");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(coursesDAO.findAll());
+        String json = gson.toJson(adds);
 
         if (!json.isEmpty()) {
             LOGGER.info("serializationToJson FINISHED : SUCCESS " + json);

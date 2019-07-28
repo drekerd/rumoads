@@ -28,7 +28,9 @@ public class Adds {
     private double addPrice;
 
     //@Column(nullable = false)
-    private int addCategoryID;
 
-    private String addCategoryName;
+    @ManyToOne
+    @JoinColumn(name = "CATEGORY_ID")
+    private CourseCategory category;
+
 }
