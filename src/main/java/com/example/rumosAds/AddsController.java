@@ -67,10 +67,6 @@ public class AddsController {
     @Autowired
     private ClientService clientService;
 
-    private static final String FLAG_QUEUE = "flag.courses";
-    private static final String GALILEU_QUEUE = "galileu.courses";
-    private static final String EDIT_QUEUE = "edit.courses";
-
     @PostConstruct
     public void setCategories() {
 
